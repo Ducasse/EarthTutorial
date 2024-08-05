@@ -1133,7 +1133,12 @@ EarthMapCountry >> name: anObject [
 EarthMapCountry >> printOn: aStream [
 
 	super printOn: aStream.
-	aStream nextPutAll: ' ' ; nextPutAll: name
+	aStream
+		nextPutAll: ' ';
+		nextPutAll: name.
+	code ifNotNil: [  aStream
+		nextPutAll: ' - ';
+		nextPutAll: code]
 ]
 
 { #category : 'accessing' }
