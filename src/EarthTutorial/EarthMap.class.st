@@ -8,6 +8,12 @@ Class {
 	#package : 'EarthTutorial'
 }
 
+{ #category : 'as yet unclassified' }
+EarthMap >> countryNames [
+
+	^ countries collect: [ :each | each name ]
+]
+
 { #category : 'importing' }
 EarthMap >> importCountriesFrom: aFileName [
 
