@@ -8,7 +8,22 @@ Class {
 	#package : 'EarthTutorial'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : 'examples' }
+EarthMap class >> example [
+
+	<sampleInstance>
+	^ self new importCountriesFrom:
+		  FileSystem workingDirectory / 'pharo-local' / 'iceberg'
+		  / 'EarthTutorial' / 'resources' / 'world.svg'
+]
+
+{ #category : 'accessing' }
+EarthMap >> countries [
+
+	^ countries
+]
+
+{ #category : 'accessing' }
 EarthMap >> countryNames [
 
 	^ countries collect: [ :each | each name ]

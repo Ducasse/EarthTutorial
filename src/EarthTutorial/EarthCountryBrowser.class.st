@@ -1,6 +1,6 @@
 Class {
 	#name : 'EarthCountryBrowser',
-	#superclass : 'SpPresenter',
+	#superclass : 'SpPresenterWithModel',
 	#instVars : [
 		'countryList',
 		'map',
@@ -13,9 +13,20 @@ Class {
 
 { #category : 'examples' }
 EarthCountryBrowser class >> example [
-
 	<script>
-	self new open 
+	
+	| inst |
+	inst := self on: (EarthMap new importCountriesFrom:
+		       FileSystem workingDirectory / 'pharo-local' / 'iceberg'
+		       / 'EarthTutorial' / 'resources' / 'world.svg').
+	inst open
+]
+
+{ #category : 'initialization' }
+EarthCountryBrowser >> connectPresenters [
+
+	countryList whenSelectedItemChangedDo: [ :item |
+    self onCountrySelected: item ].
 ]
 
 { #category : 'layout' }
@@ -35,18 +46,11 @@ EarthCountryBrowser >> flagForCountryCode: astring [
 
 	| request pngArray |
 	request := ZnClient new.
-	request get: 'https://flagcdn.com/w320/' , astring lowercase , '.png'.
+	request get: 'https://flagcdn.com/w320/' , astring asLowercase , '.png'.
 	request isSuccess ifTrue: [
 		pngArray := request response contents.
 		^ ImageReadWriter formFromStream: (ReadStream on: pngArray) ].
 	^ BorderedMorph new asForm
-]
-
-{ #category : 'initialization' }
-EarthCountryBrowser >> initialize [
-	
-	super initialize.
-	map := EarthMap new importCountriesFrom: (FileSystem workingDirectory / 'pharo-local' / 'iceberg' / 'EarthTutorial' / 'resources' /'world.svg' ).
 ]
 
 { #category : 'initialization' }
@@ -55,11 +59,32 @@ EarthCountryBrowser >> initializePresenters [
 	super initializePresenters.
 
 	countryList := self newDropList.
-	countryList display: [ :item | item key ].
-	countryList sortingBlock: [ :a :b | a model key < b model key ].
-
+	countryList display: [ :item | item name ].
+	countryList sortingBlock: [ :a :b | a model name < b model name ].
+	countryList items: self model countries.
+	
 	countryCode := self newTextInput.
 	countryCode editable: false.
 	countryCode text: '   --   '.
 	countryFlag := self newImage
+]
+
+{ #category : 'initialization' }
+EarthCountryBrowser >> initializeWindow: aWindowPresenter [
+
+	aWindowPresenter
+		title: 'Country Flag Browser'
+]
+
+{ #category : 'initialization' }
+EarthCountryBrowser >> onCountrySelected: countryItem [
+
+	countryCode text: '    ', countryItem code.
+	self showFlag: countryItem code
+]
+
+{ #category : 'initialization' }
+EarthCountryBrowser >> showFlag: aStringCode [ 
+
+	countryFlag image: (self flagForCountryCode: aStringCode).
 ]
